@@ -2,14 +2,12 @@ package com.bhavyathacker.recyclerview;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 
@@ -24,10 +22,13 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     private ArrayList<String> mImages = new ArrayList<>();
     private Context mContext;
 
-    public RecyclerViewAdapter(Context mContext, ArrayList<String> mImageNames, ArrayList<String> mImages) {
+    ListItemClickListener mOnClickListener;
+
+    public RecyclerViewAdapter(Context mContext, ArrayList<String> mImageNames, ArrayList<String> mImages, ListItemClickListener listItemClickListener) {
         this.mImageNames = mImageNames;
         this.mImages = mImages;
         this.mContext = mContext;
+        mOnClickListener = listItemClickListener;
     }
 
     @NonNull
@@ -43,13 +44,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         Log.d(TAG, "onBindViewHolder: called.");
         Glide.with(mContext).asBitmap().load(mImages.get(i)).into(viewHolder.ivListitem);
         viewHolder.tvListitem.setText(mImageNames.get(i));
-        viewHolder.layoutListItem.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(TAG, "onClick: clicked on :" + mImageNames.get(i));
-                Toast.makeText(mContext, mImageNames.get(i) + " at " + i, Toast.LENGTH_SHORT).show();
-            }
-        });
+
     }
 
     @Override
@@ -58,19 +53,32 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     }
 
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         CircleImageView ivListitem;
         TextView tvListitem;
-        ConstraintLayout layoutListItem;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             ivListitem = itemView.findViewById(R.id.iv_listitem);
             tvListitem = itemView.findViewById(R.id.tv_listitem);
-            layoutListItem = itemView.findViewById(R.id.layout_listitem);
-
+            itemView.setOnClickListener(this);
 
         }
+
+        /**
+         * Called when a view has been clicked.
+         *
+         * @param v The view that was clicked.
+         */
+        @Override
+        public void onClick(View v) {
+            int clickedPosition = getAdapterPosition();
+            mOnClickListener.onListItemClick(clickedPosition);
+        }
+    }
+
+    public interface ListItemClickListener {
+        void onListItemClick(int clickedItemIndex);
     }
 }

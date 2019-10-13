@@ -5,14 +5,17 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements RecyclerViewAdapter.ListItemClickListener {
 
     private static final String TAG = "MainActivity";
     private ArrayList<String> mImageNames = new ArrayList<>();
     private ArrayList<String> mImageUrls = new ArrayList<>();
+
+    private Toast mToast;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,8 +70,17 @@ public class MainActivity extends AppCompatActivity {
     private void initRecyclerView() {
         Log.d(TAG, "initRecyclerView: ");
         RecyclerView recyclerView = findViewById(R.id.rv_main);
-        RecyclerViewAdapter adapter = new RecyclerViewAdapter(this, mImageNames, mImageUrls);
+        RecyclerViewAdapter adapter = new RecyclerViewAdapter(this, mImageNames, mImageUrls, this);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+    }
+
+    @Override
+    public void onListItemClick(int clickedItemIndex) {
+        if (mToast != null) {
+            mToast.cancel();
+        }
+        mToast = Toast.makeText(this, mImageNames.get(clickedItemIndex) + " at " + clickedItemIndex, Toast.LENGTH_SHORT);
+        mToast.show();
     }
 }
